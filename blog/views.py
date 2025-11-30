@@ -16,9 +16,9 @@ def get_post_detail(request, post_id):
 
 
 def create_post(request):
+  form = PostForm(request.POST or None)
+  
   if request.method == "POST":
-    form = PostForm(request.POST)
-
     if form.is_valid():
       post = Post.objects.create(
         title=form.cleaned_data['title'],
@@ -26,10 +26,6 @@ def create_post(request):
       )
 
       return redirect('post_detail', post_id=post.id)
-    else:
-      return render(request, 'blog/post_add.html', {"form": form})
-
-  # GET
-  form = PostForm()
+    # Если форма невалидна, продолжим к render ниже
   
   return render(request, 'blog/post_add.html', {"form": form})
