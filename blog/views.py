@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 
 from blog.models import Post
+from blog.forms import PostForm
 
 
 def get_post_list(request):
@@ -16,27 +17,19 @@ def get_post_detail(request, post_id):
 
 def create_post(request):
   if request.method == "POST":
-    title = request.POST.get('title').strip()
-    text = request.POST.get('text').strip()
+    form = PostForm(request.POST)
 
-    errors = {}
-
-    if not title:
-      errors['title'] = 'Заголовок обязателен.'
-    if not text:
-      errors['text'] = 'Текст поста обязателено нужно указать.'
-
-    if not errors:
-      post = Post.objects.create(title=title, text=text)
+    if form.is_valid():
+      post = Post.objects.create(
+        title=form.cleaned_data['title'],
+        text=form.cleaned_data['text']
+      )
 
       return redirect('post_detail', post_id=post.id)
     else:
-      context = {
-        'errors': errors,
-        'title': title,
-        'text': text
-      }
+      return render(request, 'blog/post_add.html', {"form": form})
 
-      return render(request, 'blog/post_add.html', context)
-
-  return render(request, 'blog/post_add.html')
+  # GET
+  form = PostForm()
+  
+  return render(request, 'blog/post_add.html', {"form": form})
