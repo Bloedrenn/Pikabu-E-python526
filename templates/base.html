@@ -9,7 +9,12 @@
     <link rel="stylesheet" href="{% static 'css/core.css' %}">
   </head>
   <body>
-    <header>Общая шапка для сайта</header>
+    <header>
+      <nav>
+        <a href="{% url "post_list" %}">Все посты</a>
+        <a href="{% url "new_post" %}">Создать пост</a>
+      </nav>
+    </header>
     <main>{% block page_content %}{% endblock page_content %}</main>
     <footer>&copy; Все права защищены 2025</footer>
   </body>
