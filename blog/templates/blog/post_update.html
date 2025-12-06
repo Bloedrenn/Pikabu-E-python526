@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block page_title %}Редактировать пост{% endblock page_title %}
+
+{% block page_content %}
+  <h1>Редактировать пост</h1>
+
+  <form method="POST">
+    {% csrf_token %}
+    
+    <div>
+      {{ form.title.label_tag }}
+      {{ form.title }}
+      {{ form.title.errors }}
+    </div>
+
+    <div>
+      {{ form.text.label_tag }}
+      {{ form.text }}
+      {{ form.text.errors }}
+    </div>
+
+    <button type="submit">Сохранить</button>
+  </form>
+{% endblock page_content %}
