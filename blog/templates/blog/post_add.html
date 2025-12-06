@@ -8,22 +8,6 @@
     <form method="POST">
         {% csrf_token %}
 
-        {% comment %} 
-        Вариант 1
-        {{ form.as_div }} 
-        {% endcomment %}
-
-        {# Вариант 2 #}
-        {% for field in form %}
-            <div>
-                {{ field.label_tag }}
-                {{ field }}
-                {{ field.errors }}
-            </div>
-        {% endfor %}
-
-        {% comment %}
-        Вариант 3
         <div>
             {{ form.title.label_tag }}
             {{ form.title }}
@@ -33,9 +17,8 @@
         <div>
             {{ form.text.label_tag }}
             {{ form.text }}
-            {{ form.title.errors }}
+            {{ form.text.errors }}
         </div>
-        {% endcomment %}
 
         <button type="submit">Создать</button>
     </form>
