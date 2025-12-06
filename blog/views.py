@@ -53,6 +53,10 @@ def update_post(request, post_id):
 
 
 def delete_post(request, post_id):
-  get_object_or_404(Post, id=post_id).delete()
+  post = get_object_or_404(Post, id=post_id)
 
-  return redirect("post_list")
+  if request.method == "POST":
+    post.delete()
+    return redirect("post_list")
+  
+  return render(request, 'blog/confirm_post_delete.html', {'post': post})
