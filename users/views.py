@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
 
+from config.settings import DEFAULT_LOGIN_REDIRECT_URL
+
 
 def register_view(request):
   if request.method == "POST":
@@ -24,7 +26,8 @@ def login_view(request):
     if form.is_valid():
       login(request, form.get_user())
 
-      return redirect("blog:post_list")
+      next_url = request.GET.get('next', DEFAULT_LOGIN_REDIRECT_URL) # next будет '/posts/add/', например
+      return redirect(next_url)
     else:
       return render(request, 'users/login.html', {'form': form})
 
