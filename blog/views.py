@@ -25,7 +25,7 @@ def create_post(request):
     if form.is_valid():
       post = form.save()
 
-      return redirect('post_detail', post_id=post.id)
+      return redirect('blog:post_detail', post_id=post.id)
     # Если форма невалидна, продолжим к render ниже
   
   return render(request, 'blog/post_form.html', {"form": form, 'title': title, 'submit_button_text': submit_button_text})
@@ -43,7 +43,7 @@ def update_post(request, post_id):
     if form.is_valid():
       form.save()
 
-      return redirect("post_detail", post_id=post.id)
+      return redirect("blog:post_detail", post_id=post.id)
     else:
       return render(request, 'blog/post_form.html', context={"form": form, 'title': title, 'submit_button_text': submit_button_text})
 
@@ -57,6 +57,6 @@ def delete_post(request, post_id):
 
   if request.method == "POST":
     post.delete()
-    return redirect("post_list")
+    return redirect("blog:post_list")
   
   return render(request, 'blog/confirm_post_delete.html', {'post': post})

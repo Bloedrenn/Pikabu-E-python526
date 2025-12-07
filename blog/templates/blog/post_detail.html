@@ -3,7 +3,7 @@
 {% block page_title %}{{ post.title }}{% endblock page_title %}
 
 {% block page_content %}
-  <a href="{% url 'post_list' %}">&larr;Назад</a>
+  <a href="{% url 'blog:post_list' %}">&larr;Назад</a>
 
   <h1>Детали поста:</h1>
   <h2>ID поста: {{ post.id }}</h2>
@@ -11,6 +11,6 @@
   <p>{{ post.text }}</p>
   <p>{{ post.created_at|date:"d.m.Y H:i" }}</p>
 
-  <a href="{% url 'edit_post' post.id %}">Редактировать пост</a>
-  <a href="{% url 'remove_post' post.id %}">Удалить пост</a>
+  <a href="{% url 'blog:edit_post' post.id %}">Редактировать пост</a>
+  <a href="{% url 'blog:remove_post' post.id %}">Удалить пост</a>
 {% endblock page_content %}
