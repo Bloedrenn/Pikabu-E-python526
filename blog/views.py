@@ -25,7 +25,9 @@ def create_post(request):
   
   if request.method == "POST":
     if form.is_valid():
-      post = form.save()
+      post = form.save(commit=False)
+      post.author = request.user
+      post.save()
 
       return redirect('blog:post_detail', post_id=post.id)
     # Если форма невалидна, продолжим к render ниже
