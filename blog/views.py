@@ -8,7 +8,7 @@ from blog.forms import PostForm
 
 
 def get_post_list(request):
-  posts = Post.objects.all()
+  posts = Post.objects.filter(status="published")
 
   return render(request, template_name='blog/post_list.html', context={'posts': posts})
 
