@@ -10,7 +10,7 @@ from blog.forms import PostForm
 def get_post_list(request):
   posts = Post.objects.filter(status="published")
 
-  return render(request, template_name='blog/post_list.html', context={'posts': posts})
+  return render(request, template_name='blog/pages/post_list.html', context={'posts': posts})
 
 
 def get_category_posts(request, category_slug):
@@ -21,12 +21,12 @@ def get_category_posts(request, category_slug):
     'category': category,
     'posts': posts
   }
-  return render(request, 'blog/category_posts.html', context)
+  return render(request, 'blog/pages/category_posts.html', context)
 
 
 def get_post_detail(request, post_slug):
-  # return render(request, 'blog/post_detail.html', {"post": Post.objects.get(slug=post_slug)})
-  return render(request, 'blog/post_detail.html', {"post": get_object_or_404(Post, slug=post_slug)})
+  # return render(request, 'blog/pages/post_detail.html', {"post": Post.objects.get(slug=post_slug)})
+  return render(request, 'blog/pages/post_detail.html', {"post": get_object_or_404(Post, slug=post_slug)})
 
 
 @login_required
@@ -46,7 +46,7 @@ def create_post(request):
       return redirect('blog:post_detail', post_slug=post.slug)
     # Если форма невалидна, продолжим к render ниже
   
-  return render(request, 'blog/post_form.html', {"form": form, 'title': title, 'submit_button_text': submit_button_text})
+  return render(request, 'blog/pages/post_form.html', {"form": form, 'title': title, 'submit_button_text': submit_button_text})
 
 
 def update_post(request, post_id):
@@ -56,7 +56,7 @@ def update_post(request, post_id):
   post = get_object_or_404(Post, id=post_id)
 
   if (request.user != post.author):
-    return render(request, 'blog/not_allowed.html')
+    return render(request, 'blog/pages/not_allowed.html')
 
   if request.method == "POST":
     form = PostForm(request.POST, request.FILES, instance=post)
@@ -66,25 +66,25 @@ def update_post(request, post_id):
 
       return redirect("blog:post_detail", post_slug=post.slug)
     else:
-      return render(request, 'blog/post_form.html', context={"form": form, 'title': title, 'submit_button_text': submit_button_text})
+      return render(request, 'blog/pages/post_form.html', context={"form": form, 'title': title, 'submit_button_text': submit_button_text})
 
   form = PostForm(instance=post)
 
-  return render(request, 'blog/post_form.html', context={"form": form, 'title': title, 'submit_button_text': submit_button_text})
+  return render(request, 'blog/pages/post_form.html', context={"form": form, 'title': title, 'submit_button_text': submit_button_text})
 
 
 def delete_post(request, post_id):
   post = get_object_or_404(Post, id=post_id)
 
   if (request.user != post.author):
-    return render(request, 'blog/not_allowed.html')
+    return render(request, 'blog/pages/not_allowed.html')
 
   if request.method == "POST":
     post.delete()
     return redirect("blog:post_list")
   
-  return render(request, 'blog/confirm_post_delete.html', {'post': post})
+  return render(request, 'blog/pages/confirm_post_delete.html', {'post': post})
 
 
 def main_page_view(request):
-  return render(request, template_name='blog/main_page.html')
+  return render(request, template_name='blog/pages/main_page.html')
