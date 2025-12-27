@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.text import slugify
 from unidecode import unidecode
 
-from blog.models import Post, Category
+from blog.models import Post, Category, Tag
 from blog.forms import PostForm
 
 
@@ -22,6 +22,16 @@ def get_category_posts(request, category_slug):
     'posts': posts
   }
   return render(request, 'blog/pages/category_posts.html', context)
+
+
+def get_tag_posts(request, tag_slug):
+  tag = get_object_or_404(Tag, slug=tag_slug)
+  posts = Post.objects.filter(tags=tag, status='published')
+
+  return render(request, 'blog/pages/tag_posts.html', {
+    'tag': tag,
+    'posts': posts
+  })
 
 
 def get_post_detail(request, post_slug):
