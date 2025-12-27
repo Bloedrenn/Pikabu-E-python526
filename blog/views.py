@@ -53,6 +53,8 @@ def create_post(request):
       post.slug = slugify(unidecode(post.title))
       post.save()
 
+      form.save_m2m()
+
       return redirect('blog:post_detail', post_slug=post.slug)
     # Если форма невалидна, продолжим к render ниже
   
