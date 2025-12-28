@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils.text import slugify
 from unidecode import unidecode
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 
 from blog.models import Post, Category, Tag
 from blog.forms import PostForm
@@ -46,9 +46,12 @@ class TagPostsView(ListView):
     return context
 
 
-def get_post_detail(request, post_slug):
-  # return render(request, 'blog/pages/post_detail.html', {"post": Post.objects.get(slug=post_slug)})
-  return render(request, 'blog/pages/post_detail.html', {"post": get_object_or_404(Post, slug=post_slug)})
+class PostDetailView(DetailView):
+  model = Post
+  slug_url_kwarg = 'post_slug'
+  template_name = 'blog/pages/post_detail.html'
+  # context_object_name = 'post' Необязательно
+  # slug_field = 'slug' Необязательно
 
 
 @login_required
