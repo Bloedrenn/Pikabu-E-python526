@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
 from django.utils.text import slugify
 from unidecode import unidecode
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from blog.models import Post, Category, Tag
 from blog.forms import PostForm
@@ -54,30 +54,26 @@ class PostDetailView(DetailView):
   # slug_field = 'slug' Необязательно
 
 
-@login_required
-def create_post(request):
-  title = "Создать пост"
-  submit_button_text = 'Создать'
+class CreatePostView(LoginRequiredMixin, CreateView):
+  form_class = PostForm
+  template_name = 'blog/pages/post_form.html'
+  extra_context = {
+    'title': "Создать пост",
+    'submit_button_text': "Создать"
+  }
 
-  form = PostForm(request.POST or None, request.FILES or None)
-  
-  if request.method == "POST":
-    if form.is_valid():
-      post = form.save(commit=False)
-      post.author = request.user
-      post.slug = slugify(unidecode(post.title))
-      post.save()
+  def form_valid(self, form):
+    post = form.save(commit=False)
+    post.author = self.request.user
+    post.slug = slugify(unidecode(post.title))
+    post.save()
 
-      tags = form.cleaned_data.get('tags_input')
+    tags = form.cleaned_data.get('tags_input')
+    for tag_name in tags:
+      tag, _ = Tag.objects.get_or_create(name=tag_name)
+      post.tags.add(tag)
 
-      for tag_name in tags:
-        tag, _ = Tag.objects.get_or_create(name=tag_name)
-        post.tags.add(tag)
-
-      return redirect('blog:post_detail', post_slug=post.slug)
-    # Если форма невалидна, продолжим к render ниже
-  
-  return render(request, 'blog/pages/post_form.html', {"form": form, 'title': title, 'submit_button_text': submit_button_text})
+    return redirect('blog:post_detail', post_slug=post.slug)
 
 
 def update_post(request, post_id):
