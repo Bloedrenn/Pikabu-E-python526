@@ -2,15 +2,16 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils.text import slugify
 from unidecode import unidecode
+from django.views.generic import ListView
 
 from blog.models import Post, Category, Tag
 from blog.forms import PostForm
 
 
-def get_post_list(request):
-  posts = Post.objects.filter(status="published")
-
-  return render(request, template_name='blog/pages/post_list.html', context={'posts': posts})
+class PostListView(ListView):
+  template_name = 'blog/pages/post_list.html'
+  context_object_name = 'posts'
+  queryset = Post.objects.filter(status="published")
 
 
 def get_category_posts(request, category_slug):
