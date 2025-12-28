@@ -24,6 +24,7 @@ class Post(models.Model):
   tags = models.ManyToManyField("Tag", related_name='posts', blank=True, verbose_name='Теги')
   text = models.TextField(verbose_name="Текст")
   image = models.ImageField(upload_to="post_images/", null=True, blank=True)
+  updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата последнего изменения")
   created_at = models.DateTimeField(auto_now_add=True)
   author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts') # можно указать SET_NULL
   status = models.CharField(choices=STATUS_CHOICES, default='draft', verbose_name="Статус")
