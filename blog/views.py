@@ -53,7 +53,11 @@ def create_post(request):
       post.slug = slugify(unidecode(post.title))
       post.save()
 
-      form.save_m2m()
+      tags = form.cleaned_data.get('tags_input')
+
+      for tag_name in tags:
+        tag, _ = Tag.objects.get_or_create(name=tag_name)
+        post.tags.add(tag)
 
       return redirect('blog:post_detail', post_slug=post.slug)
     # Если форма невалидна, продолжим к render ниже
@@ -76,11 +80,18 @@ def update_post(request, post_id):
     if form.is_valid():
       form.save()
 
+      tags = form.cleaned_data.get('tags_input')
+      post.tags.clear()
+      for tag_name in tags:
+        tag, _ = Tag.objects.get_or_create(name=tag_name)
+        post.tags.add(tag)
+
       return redirect("blog:post_detail", post_slug=post.slug)
     else:
       return render(request, 'blog/pages/post_form.html', context={"form": form, 'title': title, 'submit_button_text': submit_button_text})
 
-  form = PostForm(instance=post)
+  existing_tags = ", ".join(tag.name for tag in post.tags.all())
+  form = PostForm(instance=post, initial={'tags_input': existing_tags})
 
   return render(request, 'blog/pages/post_form.html', context={"form": form, 'title': title, 'submit_button_text': submit_button_text})
 
