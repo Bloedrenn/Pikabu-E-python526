@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.views.generic import CreateView, DetailView
 from django.contrib.auth.views import LoginView, LogoutView
 
 from django.conf import settings
@@ -31,13 +31,16 @@ class CustomLogoutView(LogoutView):
   next_page = reverse_lazy('blog:post_list')
 
 
-def profile_view(request, username):
-  user = get_object_or_404(User, username=username)
-  posts = user.posts.order_by('-created_at')
+class ProfileView(DetailView):
+  model = User
+  slug_url_kwarg = 'username'
+  slug_field = 'username'
+  template_name = 'users/pages/profile.html'
+  # context_object_name = 'user' Необязательно
 
-  context = {
-    'user': user,
-    'posts': posts
-  }
+  def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
 
-  return render(request, 'users/pages/profile.html', context)
+    context['posts'] = self.object.posts.order_by('-created_at')
+
+    return context
