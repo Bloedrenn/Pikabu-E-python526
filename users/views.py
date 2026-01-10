@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth import login, logout, get_user_model
+from django.contrib.auth import logout, get_user_model
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
+from django.contrib.auth.views import LoginView
 
 from django.conf import settings
 
@@ -15,23 +16,15 @@ class RegisterView(CreateView):
   success_url = reverse_lazy('users:login')
 
 
-def login_view(request):
-  if request.method == "POST":
-    form = AuthenticationForm(data=request.POST)
-    if form.is_valid():
-      login(request, form.get_user())
+class CustomLoginView(LoginView):
+  template_name = 'users/pages/login.html'
+  authentication_form = AuthenticationForm
 
-      next_url = request.GET.get('next', settings.DEFAULT_LOGIN_REDIRECT_URL) # next будет '/posts/add/', например
-      if next_url == settings.DEFAULT_LOGIN_REDIRECT_URL:
-        return redirect(next_url, request.user.username)
-      else:
-        return redirect(next_url)
-    else:
-      return render(request, 'users/pages/login.html', {'form': form})
-
-  form = AuthenticationForm()
-
-  return render(request, 'users/pages/login.html', {'form': form})
+  def get_success_url(self):
+    next_url = self.request.GET.get('next', settings.DEFAULT_LOGIN_REDIRECT_URL)
+    if next_url == settings.DEFAULT_LOGIN_REDIRECT_URL:
+      return reverse_lazy(next_url, kwargs={'username': self.request.user.username})
+    return next_url
 
 
 def logout_view(request):
