@@ -10,7 +10,7 @@ urlpatterns = [
   path('posts/tag/<slug:tag_slug>/', views.TagPostsView.as_view(), name="tag_posts"),
   path('posts/add/', views.CreatePostView.as_view(), name="new_post"),
   path('posts/<int:post_id>/edit/', views.PostUpdateView.as_view(), name="edit_post"),
-  path('posts/<int:post_id>/delete/', views.delete_post, name="remove_post"),
+  path('posts/<int:post_id>/delete/', views.PostDeleteView.as_view(), name="remove_post"),
   path('posts/<slug:post_slug>/', views.PostDetailView.as_view(), name="post_detail"),
   path('', views.main_page_view, name='main_page'),
 ]
