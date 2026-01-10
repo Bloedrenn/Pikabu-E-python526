@@ -65,7 +65,6 @@ class CreatePostView(LoginRequiredMixin, CreateView):
   def form_valid(self, form):
     post = form.save(commit=False)
     post.author = self.request.user
-    post.slug = slugify(unidecode(post.title))
     post.save()
 
     tags = form.cleaned_data.get('tags_input')

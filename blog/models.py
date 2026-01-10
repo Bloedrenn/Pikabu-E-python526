@@ -29,6 +29,11 @@ class Post(models.Model):
   author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts') # можно указать SET_NULL
   status = models.CharField(choices=STATUS_CHOICES, default='draft', verbose_name="Статус")
 
+  def save(self, *args, **kwargs):
+    self.slug = slugify(unidecode(self.title))
+
+    super().save(*args, **kwargs)
+
   class Meta:
     verbose_name = 'пост'
     verbose_name_plural = 'посты'
