@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load bootstrap_icons %}
 
 {% block page_title %}{{ post.title }}{% endblock page_title %}
 
@@ -32,7 +33,10 @@
   <p>Дата создания поста: <span class="date-field">{{ post.created_at|date:"c" }}</span></p>
   <p>Дата последнего изменения поста: <span class="date-field">{{ post.updated_at|date:"c" }}</span></p>
 
-  <p>Автор поста: <a href="{% url "users:profile" username=post.author.username %}">{{ post.author }}<a></p>
+  <p>
+    Автор поста: <a href="{% url "users:profile" username=post.author.username %}">{{ post.author }}</a>
+    {% bs_icon 'eye' %} {{ post.views }}
+  </p>
 
   {% if request.user == post.author %}
     <a href="{% url 'blog:edit_post' post.id %}">Редактировать пост</a>

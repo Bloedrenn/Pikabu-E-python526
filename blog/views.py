@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import F
 
 from blog.models import Post, Category, Tag
 from blog.forms import PostForm
@@ -52,6 +53,17 @@ class PostDetailView(DetailView):
   template_name = 'blog/pages/post_detail.html'
   # context_object_name = 'post' Необязательно
   # slug_field = 'slug' Необязательно
+
+  def get_object(self, queryset=None):
+    post = super().get_object(queryset)
+
+    session_key = f'post_{post.id}_viewed' # "post_32_viewed"
+    if not self.request.session.get(session_key, False) and post.author != self.request.user:
+      Post.objects.filter(id=post.id).update(views=F("views") + 1)
+      post.views = post.views + 1
+      self.request.session[session_key] = True
+
+    return post
 
 
 class CreatePostView(LoginRequiredMixin, CreateView):
