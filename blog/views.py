@@ -57,11 +57,15 @@ class PostDetailView(DetailView):
   def get_object(self, queryset=None):
     post = super().get_object(queryset)
 
+    user = self.request.user
     session_key = f'post_{post.id}_viewed' # "post_32_viewed"
-    if not self.request.session.get(session_key, False) and post.author != self.request.user:
+    if not self.request.session.get(session_key, False) and post.author != user:
       Post.objects.filter(id=post.id).update(views=F("views") + 1)
       post.views = post.views + 1
       self.request.session[session_key] = True
+
+    if user.is_authenticated and user != post.author and not post.viewed_users.filter(id=user.id).exists():
+      post.viewed_users.add(user)
 
     return post
 
