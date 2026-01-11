@@ -10,7 +10,8 @@ from blog.forms import PostForm
 class PostListView(ListView):
   template_name = 'blog/pages/post_list.html'
   context_object_name = 'posts'
-  queryset = Post.objects.filter(status="published")
+  queryset = Post.objects.filter(status="published").order_by('-created_at')
+  paginate_by = 3
 
 
 class CategoryPostsView(ListView):
