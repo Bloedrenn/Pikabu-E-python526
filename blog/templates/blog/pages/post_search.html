@@ -7,7 +7,7 @@
 
   {# method="GET" Указывать необязательно #}
   <form>
-    <input type="text" name="search" placeholder="Введите запрос" value="{{ request.GET.search }}">
+    <input autocomplete="off" spellcheck="false" type="text" name="search" placeholder="Введите запрос" value="{{ request.GET.search }}">
 
     <label>
       <input type="checkbox" name="search_category" {% if request.GET.search_category %}checked{% endif %}>
@@ -25,9 +25,13 @@
 
   {% if search_performed %}
     {% if posts %}
+      <h2>Найден(-о) {{ paginator.count }} пост(-а, -ов):</h2>
+
       {% for post in posts %}
         {% include 'blog/includes/post_container.html' %}
       {% endfor %}
+
+      {% include "blog/includes/pagination.html" %}
     {% else %}
       <p>По вашему запросу ничего не найдено.</p>
     {% endif %}

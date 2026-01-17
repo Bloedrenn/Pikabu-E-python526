@@ -18,6 +18,7 @@ class PostListView(ListView):
 class PostSearchView(ListView):
   template_name = "blog/pages/post_search.html"
   context_object_name = 'posts'
+  paginate_by = 3
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
