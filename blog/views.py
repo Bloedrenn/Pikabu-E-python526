@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import F
+from django.db.models import F, Q
 
 from blog.models import Post, Category, Tag
 from blog.forms import PostForm
@@ -13,6 +13,34 @@ class PostListView(ListView):
   context_object_name = 'posts'
   queryset = Post.objects.filter(status="published").order_by('-created_at')
   paginate_by = 3
+
+
+class PostSearchView(ListView):
+  template_name = "blog/pages/post_search.html"
+  context_object_name = 'posts'
+
+  def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
+    context['search_performed'] = any(self.request.GET.keys())
+    return context
+  
+  def get_queryset(self):
+    search_query = self.request.GET.get("search")
+
+    if search_query:
+      queryset = Post.objects.filter(status="published").order_by("-created_at")
+      query = Q(title__icontains=search_query) | Q(text__icontains=search_query)
+
+      search_category = self.request.GET.get("search_category")
+      search_tag = self.request.GET.get("search_tag")
+      if search_category:
+        query |= Q(category__name__icontains=search_query)
+      if search_tag:
+        query |= Q(tags__name__icontains=search_query)
+
+      return queryset.filter(query)
+    
+    return Post.objects.none()
 
 
 class CategoryPostsView(ListView):
