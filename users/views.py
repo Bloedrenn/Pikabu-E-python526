@@ -4,6 +4,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic.list import MultipleObjectMixin
+from django.contrib import messages
 
 from django.conf import settings
 from users.forms import CustomAuthenticationForm
@@ -26,6 +27,11 @@ class CustomLoginView(LoginView):
     if next_url == settings.DEFAULT_LOGIN_REDIRECT_URL:
       return reverse_lazy(next_url, kwargs={'username': self.request.user.username})
     return next_url
+  
+  def form_invalid(self, form):
+    messages.warning(self.request, 'Ошибка входа!')
+
+    return super().form_invalid(form)
 
 
 class CustomLogoutView(LogoutView):
