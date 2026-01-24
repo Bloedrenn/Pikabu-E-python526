@@ -135,5 +135,14 @@ MEDIA_ROOT = BASE_DIR / 'media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+# Конфигурация для логина
+
 LOGIN_URL = 'users:login'
 DEFAULT_LOGIN_REDIRECT_URL = 'users:profile'
+
+
+# Аутентификация по Email'у
+
+AUTHENTICATION_BACKENDS = [
+    'users.auth_backend.EmailOrUsernameBackend'
+]
