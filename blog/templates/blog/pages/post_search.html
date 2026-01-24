@@ -1,6 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block page_title %}Поиск постов{% endblock page_title %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static "blog/css/includes/post_container.css" %}">
+{% endblock styles %}
 
 {% block page_content %}
   <h1>Поиск постов</h1>
@@ -27,9 +32,11 @@
     {% if posts %}
       <h2>Найден(-о) {{ paginator.count }} пост(-а, -ов):</h2>
 
-      {% for post in posts %}
-        {% include 'blog/includes/post_container.html' %}
-      {% endfor %}
+      <div class="container">
+        {% for post in posts %}
+          {% include 'blog/includes/post_container.html' %}
+        {% endfor %}
+      </div>
 
       {% include "blog/includes/pagination.html" %}
     {% else %}

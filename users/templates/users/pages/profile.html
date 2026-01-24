@@ -1,6 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block page_title %}Профиль{% endblock page_title %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static "blog/css/includes/post_container.css" %}">
+{% endblock styles %}
 
 {% block page_content %}
   {% if user == request.user %}
@@ -10,11 +15,13 @@
   {% endif %}
 
   {% if posts %}
-    {% for post in posts %}
-      {% if user == request.user or post.status != 'draft' %}
-        {% include 'blog/includes/post_container.html' %}
-      {% endif %}
-    {% endfor %}
+    <div class="container">
+      {% for post in posts %}
+        {% if user == request.user or post.status != 'draft' %}
+          {% include 'blog/includes/post_container.html' %}
+        {% endif %}
+      {% endfor %}
+    </div>
   {% else %}
     <p>Постов ещё нет. Загляните позже!</p>
   {% endif %}

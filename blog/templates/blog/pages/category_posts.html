@@ -1,15 +1,22 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block page_title %}Посты в категории {{ category.name }}{% endblock page_title %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static "blog/css/includes/post_container.css" %}">
+{% endblock styles %}
 
 {% block page_content %}
   <a href="javascript:history.back()">&larr;Назад</a>
   <h1>Посты в категории: {{ category.name }}</h1>
   
   {% if posts %}
-    {% for post in posts %}
-      {% include 'blog/includes/post_container.html' %}
-    {% endfor %}
+    <div class="container">
+      {% for post in posts %}
+        {% include 'blog/includes/post_container.html' %}
+      {% endfor %}
+    </div>
   {% else %}
     <p>В этой категории пока нет постов.</p>
   {% endif %}

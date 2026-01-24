@@ -1,6 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block page_title %}Все посты{% endblock page_title %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static "blog/css/includes/post_container.css" %}">
+{% endblock styles %}
 
 {% block page_content %}
   <h1>Все посты</h1>
@@ -10,9 +15,11 @@
   {% endcomment %}
   {# Отображение постов #}
   {% if posts %}
-    {% for post in posts %}
-      {% include 'blog/includes/post_container.html' %}
-    {% endfor %}
+    <div class="container">
+      {% for post in posts %}
+        {% include 'blog/includes/post_container.html' %}
+      {% endfor %}
+    </div>
   {% else %}
     <p>Постов ещё нет. Загляните позже!</p>
   {% endif %}
