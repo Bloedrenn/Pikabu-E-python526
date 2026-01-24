@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block page_title %}Поиск постов{% endblock page_title %}
+{% block page_title %}
+  {{ block.super }} | Поиск постов
+{% endblock page_title %}
 
 {% block styles %}
   <link rel="stylesheet" href="{% static "blog/css/includes/post_container.css" %}">
