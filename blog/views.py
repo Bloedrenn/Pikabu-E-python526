@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F, Q
+from django.contrib import messages
 from django.http import JsonResponse
 
 from blog.models import Post, Category, Tag
@@ -136,6 +137,7 @@ class CreatePostView(LoginRequiredMixin, CreateView):
       tag, _ = Tag.objects.get_or_create(name=tag_name)
       post.tags.add(tag)
 
+    messages.success(self.request, 'Пост успешно создан!')
     return redirect('blog:post_detail', post_slug=post.slug)
 
 
