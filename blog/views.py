@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F, Q
 from django.contrib import messages
 from django.http import JsonResponse
+from django.template.loader import render_to_string
 
 from blog.models import Post, Category, Tag
 from blog.forms import PostForm
@@ -13,8 +14,42 @@ from blog.forms import PostForm
 class PostListView(ListView):
   template_name = 'blog/pages/post_list.html'
   context_object_name = 'posts'
-  queryset = Post.objects.filter(status="published").order_by('-created_at')
-  paginate_by = 3
+  posts_per_batch = 4
+
+  def get_queryset(self):
+    self.posts_query = Post.objects.filter(status="published").order_by('-created_at')
+    return self.posts_query[:self.posts_per_batch]
+
+  def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
+
+    context["has_more_posts"] = self.posts_query.count() > self.posts_per_batch
+    context["posts_per_batch"] = self.posts_per_batch
+
+    return context
+
+
+def load_more_posts_view(request):
+  import time
+  time.sleep(1)
+
+  offset = int(request.GET.get("offset"))
+  posts_per_batch = PostListView.posts_per_batch
+
+  posts_query = Post.objects.filter(status="published").order_by('-created_at')
+  posts = posts_query[offset:offset + posts_per_batch]
+
+  posts_html_string = ''.join([
+    render_to_string("blog/includes/post_container.html", {"post": post}, request)
+    for post in posts
+  ])
+
+  has_more_posts = offset + posts_per_batch < posts_query.count()
+
+  return JsonResponse({
+    'html': posts_html_string,
+    'has_more': has_more_posts
+  })
 
 
 class PostSearchView(ListView):
