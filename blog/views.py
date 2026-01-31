@@ -284,3 +284,19 @@ def post_dislike_toggle_view(request, post_id):
     'has_disliked': has_disliked,
     'has_liked': has_liked
   })
+
+
+def post_favorite_toggle_view(request, post_id):
+  post = get_object_or_404(Post, id=post_id)
+
+  if request.user in post.bookmarked_by.all():
+    post.bookmarked_by.remove(request.user)
+    is_favorite = False
+  else:
+    post.bookmarked_by.add(request.user)
+    is_favorite = True
+
+  return JsonResponse({
+    'is_favorite': is_favorite,
+    'favorites_count': post.bookmarked_by.count()
+  })

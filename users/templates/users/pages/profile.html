@@ -7,9 +7,16 @@
   <link rel="stylesheet" href="{% static "blog/css/includes/post_container.css" %}">
 {% endblock styles %}
 
+{% block scripts %}
+  <script src="{% static "blog/js/favorites.js" %}" type="module" defer></script>
+{% endblock scripts %}
+
 {% block page_content %}
   {% if user == request.user %}
     <h1>Мой профиль</h1>
+    <a href="{% url 'users:favorite_posts' %}" class="btn btn-outline-primary">
+      Посмотреть избранные посты
+    </a>
   {% else %}
     <h1>Профиль пользователя {{ user }}</h1>
   {% endif %}

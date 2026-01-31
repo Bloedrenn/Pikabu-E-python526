@@ -42,6 +42,12 @@ class Post(models.Model):
     blank=True,
     verbose_name="Дизлайки"
   )
+  bookmarked_by = models.ManyToManyField(
+    User,
+    related_name="bookmarked_posts",
+    blank=True,
+    verbose_name="В избранном у"
+  )
 
   def save(self, *args, **kwargs):
     self.slug = slugify(unidecode(self.title))
