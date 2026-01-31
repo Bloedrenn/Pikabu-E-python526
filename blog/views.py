@@ -6,8 +6,9 @@ from django.db.models import F, Q
 from django.contrib import messages
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+from django.views.decorators.http import require_POST
 
-from blog.models import Post, Category, Tag
+from blog.models import Post, Category, Tag, Comment
 from blog.forms import PostForm
 
 
@@ -299,4 +300,30 @@ def post_favorite_toggle_view(request, post_id):
   return JsonResponse({
     'is_favorite': is_favorite,
     'favorites_count': post.bookmarked_by.count()
+  })
+
+
+@require_POST
+def add_comment_view(request, post_id):
+  text = request.POST.get('text', '').strip()
+  if not text:
+    return JsonResponse({'success': False, 'error': 'Текст комментария не может быть пустым'})
+  
+  post = get_object_or_404(Post, id=post_id)
+  comment = Comment.objects.create(
+    post=post,
+    author=request.user,
+    text=text
+  )
+  
+  comment_html = render_to_string(
+    "blog/includes/comment_container.html", 
+    {"comment": comment}, 
+    request
+  )
+
+  return JsonResponse({
+    'success': True,
+    'comment_html': comment_html,
+    'comments_count': post.comments.count()
   })
