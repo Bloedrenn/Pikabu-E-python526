@@ -118,6 +118,7 @@ class PostDetailView(DetailView):
   model = Post
   slug_url_kwarg = 'post_slug'
   template_name = 'blog/pages/post_detail.html'
+  comments_per_batch = 5
   # context_object_name = 'post' Необязательно
   # slug_field = 'slug' Необязательно
 
@@ -151,6 +152,11 @@ class PostDetailView(DetailView):
 
     context['likes_count'] = post.liked_users.count()
     context['dislikes_count'] = post.disliked_users.count()
+
+    comments_query = post.comments.all().order_by('-created_at')
+    context["comments"] = comments_query[:self.comments_per_batch]
+    context["has_more_comments"] = comments_query.count() > self.comments_per_batch
+    context["comments_per_batch"] = self.comments_per_batch
 
     return context
 
@@ -326,4 +332,28 @@ def add_comment_view(request, post_id):
     'success': True,
     'comment_html': comment_html,
     'comments_count': post.comments.count()
+  })
+
+
+def load_more_comments_view(request, post_id):
+  from time import sleep
+  sleep(0.5)
+
+  offset = int(request.GET.get("offset"))
+  comments_per_batch = PostDetailView.comments_per_batch
+
+  post = get_object_or_404(Post, id=post_id)
+  comments_query = post.comments.all().order_by('-created_at')
+  
+  comments = comments_query[offset:offset + comments_per_batch]
+
+  comments_html = ''.join([
+    render_to_string("blog/includes/comment_container.html", {"comment": comment}, request)
+    for comment in comments
+  ])
+  has_more_comments = offset + comments_per_batch < comments_query.count()
+
+  return JsonResponse({
+    'html': comments_html,
+    'has_more': has_more_comments
   })
