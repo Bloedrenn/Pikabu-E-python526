@@ -153,7 +153,8 @@ class PostDetailView(DetailView):
     context['likes_count'] = post.liked_users.count()
     context['dislikes_count'] = post.disliked_users.count()
 
-    comments_query = post.comments.all().order_by('-created_at')
+    # Берем только корневые комментарии (без родителей)
+    comments_query = post.comments.filter(parent__isnull=True).order_by('-created_at')
     context["comments"] = comments_query[:self.comments_per_batch]
     context["has_more_comments"] = comments_query.count() > self.comments_per_batch
     context["comments_per_batch"] = self.comments_per_batch
@@ -315,12 +316,16 @@ def add_comment_view(request, post_id):
   if not text:
     return JsonResponse({'success': False, 'error': 'Текст комментария не может быть пустым'})
   
+  parent_id = request.POST.get('parent_id', '')
   post = get_object_or_404(Post, id=post_id)
-  comment = Comment.objects.create(
-    post=post,
-    author=request.user,
-    text=text
-  )
+  comment_data = {
+    'post': post,
+    'author': request.user,
+    'text': text
+  }
+  if parent_id:
+    comment_data['parent'] = Comment.objects.get(id=parent_id)
+  comment = Comment.objects.create(**comment_data)
   
   comment_html = render_to_string(
     "blog/includes/comment_container.html", 
@@ -343,7 +348,8 @@ def load_more_comments_view(request, post_id):
   comments_per_batch = PostDetailView.comments_per_batch
 
   post = get_object_or_404(Post, id=post_id)
-  comments_query = post.comments.all().order_by('-created_at')
+  # Берем только корневые комментарии (без родителей)
+  comments_query = post.comments.filter(parent__isnull=True).order_by('-created_at')
   
   comments = comments_query[offset:offset + comments_per_batch]
 
