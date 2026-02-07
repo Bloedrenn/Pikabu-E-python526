@@ -1,9 +1,10 @@
-{% extends "layouts/base.html" %}
+{% extends "users/layouts/profile_base.html" %}
 {% load static %}
 
 {% block page_title %}Профиль{% endblock page_title %}
 
 {% block styles %}
+  {{ block.super }}
   <link rel="stylesheet" href="{% static "blog/css/includes/post_container.css" %}">
 {% endblock styles %}
 
@@ -11,12 +12,9 @@
   <script src="{% static "blog/js/favorites.js" %}" type="module" defer></script>
 {% endblock scripts %}
 
-{% block page_content %}
+{% block profile_page_content %}
   {% if user == request.user %}
     <h1>Мой профиль</h1>
-    <a href="{% url 'users:favorite_posts' %}" class="btn btn-outline-primary">
-      Посмотреть избранные посты
-    </a>
   {% else %}
     <h1>Профиль пользователя {{ user }}</h1>
   {% endif %}
@@ -34,4 +32,4 @@
   {% endif %}
 
   {% include "blog/includes/pagination.html" %}
-{% endblock page_content %}
+{% endblock profile_page_content %}
