@@ -1,4 +1,3 @@
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView
@@ -7,15 +6,14 @@ from django.views.generic.list import MultipleObjectMixin
 from django.contrib import messages
 
 from django.conf import settings
-from blog.models import Post
-from users.forms import CustomAuthenticationForm
+from users.forms import CustomAuthenticationForm, CustomUserCreationForm
 
 User = get_user_model()
 
 
 class RegisterView(CreateView):
   template_name = 'users/pages/register.html'
-  form_class = UserCreationForm
+  form_class = CustomUserCreationForm
   success_url = reverse_lazy('users:login')
 
 
