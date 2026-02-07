@@ -1,7 +1,7 @@
 {% extends "users/layouts/profile_base.html" %}
 {% load static %}
 
-{% block page_title %}Избранные посты{% endblock page_title %}
+{% block page_title %}{{ block.super }} | Избранные посты{% endblock page_title %}
 
 {% block scripts %}
   <script src="{% static "blog/js/favorites.js" %}" type="module" defer></script>

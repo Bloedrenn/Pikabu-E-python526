@@ -1,7 +1,7 @@
 {% extends "users/layouts/profile_base.html" %}
 {% load static %}
 
-{% block page_title %}Профиль{% endblock page_title %}
+{% block page_title %}{{ block.super }} | Блог{% endblock page_title %}
 
 {% block styles %}
   {{ block.super }}
@@ -14,9 +14,9 @@
 
 {% block profile_page_content %}
   {% if user == request.user %}
-    <h1>Мой профиль</h1>
+    <h1>Мой блог</h1>
   {% else %}
-    <h1>Профиль пользователя {{ user }}</h1>
+    <h1>Блог пользователя {{ user }}</h1>
   {% endif %}
 
   {% if posts %}
