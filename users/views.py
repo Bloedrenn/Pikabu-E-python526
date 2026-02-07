@@ -43,7 +43,7 @@ class ProfileView(DetailView, MultipleObjectMixin):
   slug_field = 'username'
   template_name = 'users/pages/profile.html'
   paginate_by = 4
-  # context_object_name = 'user' Необязательно
+  context_object_name = 'user' # Теперь обязательно
 
   def get_context_data(self, **kwargs):
     posts = self.object.posts.order_by('-created_at')
