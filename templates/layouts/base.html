@@ -19,7 +19,7 @@
     <script src="{% static 'js/core.js' %}" type="module" defer></script>
     {% block scripts %}{% endblock scripts %}
   </head>
-  <body class="d-flex flex-column min-vh-100">
+  <body class="d-flex flex-column min-vh-100" data-bs-theme="{{ current_theme }}" data-theme-toggle-url="{% url "users:toggle_theme" %}">
     <header>
       <nav class="navbar navbar-expand-sm rounded-bottom bg-dark" data-bs-theme="dark">
         <div class="container-fluid">
@@ -38,6 +38,11 @@
               </li>
               <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'post_search' %}active{% endif %}" href="{% url 'blog:post_search' %}">Поиск постов</a>
+              </li>
+              <li>
+                <button id="themeToggleBtn" class="btn border-0">
+                  <i class="bi bi-{% if current_theme == 'dark' %}moon{% else %}sun{% endif %}-fill"></i>
+                </button>
               </li>
             </ul>
             <ul class="navbar-nav">

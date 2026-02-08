@@ -25,6 +25,8 @@ urlpatterns = [
   # Можно так:
   # path('password-change/done/', TemplateView.as_view(template_name='users/pages/password_change_done.html'), name='password_change_done'),
 
+  path("toggle-theme/", views.toggle_theme, name="toggle_theme"),
+
   path("favorite-posts/", views.FavoritePostsView.as_view(), name="favorite_posts"),
   path("<str:username>/", views.ProfileView.as_view(), name='profile'),
 ]
