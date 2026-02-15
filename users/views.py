@@ -111,3 +111,8 @@ class FavoritePostsView(ListView):
 
   def get_queryset(self):
     return self.request.user.bookmarked_posts.all()
+
+
+class SettingsView(TemplateView):
+  """Страница настроек профиля"""
+  template_name = 'users/pages/settings.html'
