@@ -63,6 +63,14 @@ def email_important_news_notifications(sender, instance, **kwargs):
     instance.news_item.save(update_fields=['email_notifications_sent'])
 
 
+@receiver(post_save, sender=Post)
+def unpin_other_news_on_post_publish(sender, instance, **kwargs):
+  # Проверяем, опубликован ли пост, есть ли у этого поста связанная новость и закреплена ли она
+  if instance.status == "published" and hasattr(instance, 'news_item') and instance.news_item.pinned:
+    # Снимаем закрепление с других новостей
+    News.objects.filter(pinned=True).exclude(post_item=instance).update(pinned=False)
+
+
 @receiver(post_delete, sender=News)
 def delete_related_post(sender, instance, **kwargs):
   Post.objects.filter(id=instance.post_item_id).delete()
