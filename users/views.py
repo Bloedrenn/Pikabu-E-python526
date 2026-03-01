@@ -10,12 +10,12 @@ from django.shortcuts import redirect
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 
 from django.conf import settings
 from users.forms import CustomAuthenticationForm, CustomUserCreationForm
+from utils import send_mail_custom
 
 User = get_user_model()
 
@@ -61,13 +61,12 @@ class RegisterView(CreateView):
       'site_name': site_name,
       'activation_url': activation_url
     })
-    
-    send_mail(
+
+    send_mail_custom(
       subject,
-      message,  # Текстовая версия
-      html_message=html_message,  # HTML версия
-      from_email=settings.DEFAULT_FROM_EMAIL,
-      recipient_list=[user.email]
+      html_message,
+      [user.email],
+      message
     )
 
 

@@ -1,11 +1,11 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.contrib.auth import get_user_model
 
 from django.conf import settings
 from blog.models import News, Post
+from utils import send_mail_custom
 
 User = get_user_model()
 
@@ -56,13 +56,7 @@ def email_important_news_notifications(sender, instance, **kwargs):
       # Если писать без flat=True, Django вернет список кортежей: [('admin@mail.ru',), ('user@mail.ru',)]
       # flat=True как раз «вынимает» значение из кортежа и делает список плоским: ['admin@mail.ru', 'user@mail.ru']
 
-      send_mail(
-        subject=subject,
-        message="",
-        html_message=html_message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=recipient_emails
-      )
+      send_mail_custom(subject, html_message, recipient_emails)
     
     # Помечаем, что уведомления отправлены
     instance.news_item.email_notifications_sent = True
