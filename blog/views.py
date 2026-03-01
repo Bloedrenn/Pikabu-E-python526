@@ -18,7 +18,10 @@ class PostListView(ListView):
   posts_per_batch = 4
 
   def get_queryset(self):
-    self.posts_query = Post.objects.filter(status="published").order_by('-created_at')
+    self.posts_query = Post.objects.filter(
+      status="published", 
+      news_item__isnull=True
+    ).order_by('-created_at')
     return self.posts_query[:self.posts_per_batch]
 
   def get_context_data(self, **kwargs):
@@ -37,7 +40,10 @@ def load_more_posts_view(request):
   offset = int(request.GET.get("offset"))
   posts_per_batch = PostListView.posts_per_batch
 
-  posts_query = Post.objects.filter(status="published").order_by('-created_at')
+  posts_query = Post.objects.filter(
+    status="published", 
+    news_item__isnull=True
+  ).order_by('-created_at')
   posts = posts_query[offset:offset + posts_per_batch]
 
   posts_html_string = ''.join([
@@ -67,7 +73,10 @@ class PostSearchView(ListView):
     search_query = self.request.GET.get("search")
 
     if search_query:
-      queryset = Post.objects.filter(status="published").order_by("-created_at")
+      queryset = Post.objects.filter(
+        status="published",
+        news_item__isnull=True
+      ).order_by("-created_at")
       query = Q(title__icontains=search_query) | Q(text__icontains=search_query)
 
       search_category = self.request.GET.get("search_category")
@@ -104,7 +113,11 @@ class TagPostsView(ListView):
 
   def get_queryset(self):
     self.tag = get_object_or_404(Tag, slug=self.kwargs['tag_slug'])
-    return Post.objects.filter(tags=self.tag, status='published')
+    return Post.objects.filter(
+      tags=self.tag, 
+      status='published',
+      news_item__isnull=True
+    )
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
@@ -235,6 +248,22 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
 class MainPageView(TemplateView):
   template_name = 'blog/pages/index.html'
 
+  def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
+    
+    news_posts = Post.objects.filter(
+      news_item__isnull=False,
+      status='published'
+    ).order_by('-created_at')
+    
+    context['news_posts'] = news_posts
+    
+    # Статус подписки на важные новости
+    if self.request.user.is_authenticated:
+      context['is_subscribed'] = self.request.user.subscribed_to_important_news
+    
+    return context
+
 
 def post_like_toggle_view(request, post_id):
   post = get_object_or_404(Post, id=post_id)
@@ -363,3 +392,19 @@ def load_more_comments_view(request, post_id):
     'html': comments_html,
     'has_more': has_more_comments
   })
+
+
+@require_POST
+def toggle_important_news_subscription_view(request):
+  """Переключение подписки на важные новости"""
+  # Переключаем подписку
+  request.user.subscribed_to_important_news = not request.user.subscribed_to_important_news
+  request.user.save(update_fields=['subscribed_to_important_news'])
+  
+  # Сообщение в зависимости от нового статуса
+  if request.user.subscribed_to_important_news:
+    messages.success(request, '📬 Вы подписались на важные новости!')
+  else:
+    messages.warning(request, '📭 Вы отписались от важных новостей')
+  
+  return redirect('blog:main_page')
