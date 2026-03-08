@@ -12,6 +12,8 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
+from phonenumber_field.phonenumber import PhoneNumber
+from django.contrib.auth.decorators import login_required
 
 from django.conf import settings
 from users.forms import CustomAuthenticationForm, CustomUserCreationForm
@@ -108,6 +110,67 @@ class CustomLogoutView(LogoutView):
   next_page = reverse_lazy('blog:post_list')
 
 
+@require_POST
+@login_required
+def set_phone_number(request):
+  try:
+    # Преобразуем строку в объект PhoneNumber
+    parsed_phone_number = PhoneNumber.from_string(request.POST.get('phone_number'), region='RU')
+    if parsed_phone_number.is_valid():
+      # Проверяем, не пытается ли пользователь установить заново свой же номер телефона
+      if request.user.phone_number == parsed_phone_number:
+        messages.info(request, 'Этот номер телефона уже привязан к вашему аккаунту')
+        return redirect('users:settings')
+      
+      # Проверяем, не подтвержден ли этот номер телефона у другого пользователя
+      user_verified_this_number = User.objects.filter(
+        phone_number=parsed_phone_number,
+        phone_number_verified=True
+      )
+      
+      if user_verified_this_number.exists():
+        messages.warning(request, 'Этот номер телефона уже используется другим пользователем')
+        return redirect('users:settings')
+
+      # Определяем сообщение в зависимости от того, был ли номер телефона до этого
+      if request.user.phone_number:
+        message = 'Номер телефона успешно изменён'
+      else:
+        message = 'Номер телефона успешно добавлен'
+
+      request.user.phone_number = parsed_phone_number
+      request.user.phone_number_verified = False  # Сбрасываем статус верификации (если до этого номер телефона был верифицирован)
+      request.user.save()
+      messages.success(request, message)
+    else:
+      messages.warning(request, 'Некорректный формат номера телефона')
+  except:
+    messages.warning(request, 'Указанное вами, похоже, не является номером телефона.')
+  
+  return redirect('users:settings')
+
+
+@require_POST
+@login_required
+def mark_phone_number_as_verified(request):
+  # В JS мы уже проверили код
+  # Обновляем статус верификации номера телефона
+  request.user.phone_number_verified = True
+  request.user.save()
+
+  # Удаляем этот номер телефона у других пользователей
+  users_not_verified_this_number = User.objects.filter(
+    phone_number=request.user.phone_number
+  ).exclude(id=request.user.id)
+
+  if users_not_verified_this_number.exists():
+    for user in users_not_verified_this_number:
+      user.phone_number = None
+      user.save()
+  
+  return JsonResponse({'success': True})
+
+
 class CustomPasswordChangeView(PasswordChangeView):
   template_name = 'users/pages/password_change.html'
   success_url = reverse_lazy('users:password_change_done')
@@ -185,3 +248,6 @@ class FavoritePostsView(ListView):
 class SettingsView(TemplateView):
   """Страница настроек профиля"""
   template_name = 'users/pages/settings.html'
+  extra_context = {
+    'FIREBASE_API_KEY': settings.FIREBASE_API_KEY,
+  }
