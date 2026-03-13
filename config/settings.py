@@ -36,6 +36,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,6 +49,14 @@ INSTALLED_APPS = [
     'blog',
     'users'
 ]
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Админка", # Заголовок окна браузера
+    "site_brand": "Pikabu", # Бренд в меню
+    "welcome_sign": "Добро пожаловать",
+    "copyright": "Pikabu",
+    "search_model": ["users.CustomUser"], # Глобальный поиск по моделям
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
